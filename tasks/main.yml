@@ -163,7 +163,7 @@
             line: 'php_value[date.timezone] = Asia/Kolkata'
             state: present
         when:
-            - cent_os.stdout | regex_search("CentOS Linux 7")
+            - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: Create symbolic link 
         file:
