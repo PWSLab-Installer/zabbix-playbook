@@ -79,7 +79,7 @@
 
     -   name: Ensure Zabbix Server is running and set to start on boot
         service: 
-            name: sonar 
+            name: zabbix-server 
             state: restarted 
             enabled: yes
 
