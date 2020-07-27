@@ -140,11 +140,21 @@
         when: 
             - os_check.stdout | regex_search("Ubuntu")
 
+    -   name: Execute Schema Process
+        command: mysql -uroot -p'root' zabbix -e "set global innodb_strict_mode='OFF';"
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
     -   name: Import Schema
         shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pzabbix zabbix
         ignore_errors: yes
         when: 
             - os_check.stdout | regex_search("CentOS")
+
+    -   name: Execute Schema Process
+        command: mysql -uroot -p'root' zabbix -e "set global innodb_strict_mode='ON';"
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
         
     -   name: Sets Zabbix conf file - Ubuntu
         become: true
