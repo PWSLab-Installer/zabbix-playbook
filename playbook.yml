@@ -18,6 +18,40 @@
             version: master
             force: yes
 
+    -   name: Install Role Apache
+        local_action: command ansible-galaxy install -f geerlingguy.apache 
+
+    -   name: Install Role MySQL
+        local_action: command ansible-galaxy install -f geerlingguy.mysql
+
+    -   name: Check if MYSQL is already installed
+        stat: path=/usr/bin/mysql
+        register: mysql_exists
+
+    -   name: Check if Apache is already installed
+        stat: path=/usr/sbin/httpd
+        register: apache_exists
+
+    -   name: Applying role MYSQL
+        command: mv ~/.ansible/roles/geerlingguy.mysql ~/.ansible/roles/pwslab.mysql
+        when: not mysql_exists.stat.exists
+        ignore_errors: yes
+
+    -   name: Applying role Apache
+        command: mv ~/.ansible/roles/geerlingguy.apache ~/.ansible/roles/pwslab.apache
+        when: not apache_exists.stat.exists
+        ignore_errors: yes
+
+    -   name: Installing Apache
+        include_role:
+            name: pwslab.apache
+        when: not apache_exists.stat.exists
+
+    -   name: Installing MYSQL
+        include_role:
+              name: pwslab.mysql
+        when: not mysql_exists.stat.exists
+    
     -   name: Installing Zabbix
         include_role:
             name: pwslab.zabbix
