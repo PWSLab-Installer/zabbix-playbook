@@ -84,7 +84,7 @@
             - zabbix-web-mysql-scl 
             - zabbix-apache-conf-scl
         when: 
-            - os_check.stdout | regex_search("CentOS linux 8")
+            - os_check.stdout | regex_search("CentOS Linux 8")
 
     -   name: Update cache
         yum: 
@@ -96,7 +96,7 @@
             - zabbix-web-mysql-scl 
             - zabbix-apache-conf-scl
         when: 
-            - os_check.stdout | regex_search("CentOS linux 7")
+            - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: Update cache
         apt: 
