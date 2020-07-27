@@ -61,7 +61,16 @@
             - zabbix-web-mysql
             - zabbix-agent
         when: 
-            - os_check.stdout | regex_search("CentOS")
+            - os_check.stdout | regex_search("CentOS linux 8")
+
+    -   name: Update cache
+        yum: 
+            name: "{{ item }}" 
+        loop:
+            - zabbix-server-mysql 
+            - zabbix-agent
+        when: 
+            - os_check.stdout | regex_search("CentOS linux 7")
 
     -   name: Update cache
         apt: 
