@@ -49,6 +49,18 @@
             - not apache_exists.stat.exists
             - os_check.stdout | regex_search("Ubuntu")
 
+            # Not working with CentOS 7.
+    # -   name: Configure MariaDB Repository
+    #     yum_repository:
+    #         name: mariadb
+    #         description: MariaDB
+    #         baseurl: http://yum.mariadb.org/10.2/centos7-amd64
+    #         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+    #         gpgcheck: true
+    #         state: present 
+    #     when: 
+    #         - os_check.stdout | regex_search("CentOS Linux 7") 
+
     -   name: Installing MYSQL
         include_role:
               name: pwslab.mysql
