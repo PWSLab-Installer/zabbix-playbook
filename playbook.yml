@@ -84,14 +84,14 @@
           name: pwslab.php-versions
       when: 
         - not php_exists.stat.exists
-        - not cent_os.stdout | regex_search("CentOS Linux release 8")
+        - not os_check.stdout | regex_search("CentOS Linux 8")
 
     - name: Installing PHP
       include_role:
           name: pwslab.php
       when: 
         - not php_exists.stat.exists
-        - cent_os.stdout | regex_search("CentOS")
+        - os_check.stdout | regex_search("CentOS Linux 8")
       vars:
         php_webserver_daemon: "httpd"
 

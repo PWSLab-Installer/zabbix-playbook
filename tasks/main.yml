@@ -14,6 +14,14 @@
         when: 
             - os_check.stdout | regex_search("Ubuntu 20") 
 
+    -   name: Put SELinux in permissive mode, logging actions that would be blocked.
+        selinux:
+            policy: targeted
+            state: permissive
+        when: 
+            - os_check.stdout | regex_search("CentOS") 
+
+
     -   name: Download Zabbix - CentOS 7
         get_url:
             url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/7/x86_64/zabbix-release-{{ zabbix_version }}-1.el7.noarch.rpm
@@ -55,6 +63,11 @@
         when: 
             - os_check.stdout | regex_search("CentOS")
 
+    -   name: Enable zabbix frontend
+        command: yum-config-manager --enable zabbix-frontend
+        when: 
+            - os_check.stdout | regex_search("CentOS")
+
     -   name: Update cache
         yum: 
             name: "{{ item }}" 
@@ -62,6 +75,9 @@
             - zabbix-server-mysql 
             - zabbix-web-mysql
             - zabbix-agent
+            - centos-release-scl
+            - zabbix-web-mysql-scl 
+            - zabbix-apache-conf-scl
         when: 
             - os_check.stdout | regex_search("CentOS linux 8")
 
@@ -71,6 +87,9 @@
         loop:
             - zabbix-server-mysql 
             - zabbix-agent
+            - centos-release-scl
+            - zabbix-web-mysql-scl 
+            - zabbix-apache-conf-scl
         when: 
             - os_check.stdout | regex_search("CentOS linux 7")
 
@@ -132,6 +151,15 @@
         # when:
         #         - os_check.stdout | regex_search("Ubuntu")
 
+    -   name: Applying PHP
+        lineinfile:
+            dest: /etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf
+            regexp: '^;php_value[date.timezone]'
+            line: 'php_value[date.timezone] = Asia/Kolkata'
+            state: present
+        when:
+            - cent_os.stdout | regex_search("CentOS Linux 7")
+
     -   name: Create symbolic link 
         file:
             src: "/etc/zabbix/apache.conf"
@@ -161,6 +189,13 @@
             state: restarted
         when:
                 - os_check.stdout | regex_search("CentOS")
+
+    -   name: Restart RH-PHP
+        service:
+            name: rh-php72-php-fpm
+            state: restarted
+        when:
+                - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: Ensure Zabbix Server is running and set to start on boot
         service: 
