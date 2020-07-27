@@ -35,6 +35,13 @@
         when: 
             - os_check.stdout | regex_search("Ubuntu")
 
+    -   name: Add libapache2-mod-php
+        apt: 
+            name: libapache2-mod-php 
+            update_cache: yes
+        when: 
+            - os_check.stdout | regex_search("Ubuntu")
+
     -   name: Create a new database with name 'zabbix'
         command: mysql -u root -proot -e "create database zabbix character set utf8 collate utf8_bin;"
         ignore_errors: yes
