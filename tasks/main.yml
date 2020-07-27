@@ -36,10 +36,9 @@
             - os_check.stdout | regex_search("Ubuntu")
 
     -   name: Create a new database with name 'zabbix'
-        mysql_db:
-            name: zabbix
-            state: present
-            encoding: utf8
+        command: mysql -u root -proot -e "create database zabbix character set utf8 collate utf8_bin;"
+        ignore_errors: yes
+        
 
     -   name: Grant all Privs
         mysql_user:
@@ -67,6 +66,14 @@
         template:
             src: "apache.conf.j2"
             dest: "/etc/zabbix/apache.conf"
+        when:
+                - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Create symbolic link 
+        file:
+            src: "/etc/zabbix/apache.conf"
+            dest: "/etc/apache2/sites-enabled/apache.conf"
+            state: link
         when:
                 - os_check.stdout | regex_search("Ubuntu")
 
