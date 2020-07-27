@@ -88,9 +88,6 @@
             - zabbix-agent 
             - zabbix-web-mysql
             - zabbix-apache-conf
-            - centos-release-scl
-            - zabbix-web-mysql-scl 
-            - zabbix-apache-conf-scl
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
 
