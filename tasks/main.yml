@@ -14,6 +14,11 @@
         when: 
             - os_check.stdout | regex_search("Ubuntu 20") 
 
+    -   name: Set SELinux 0
+        command: setenforce 0
+        when: 
+            - os_check.stdout | regex_search("CentOS") 
+
     -   name: Put SELinux in permissive mode, logging actions that would be blocked.
         selinux:
             policy: targeted
