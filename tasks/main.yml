@@ -86,8 +86,6 @@
         loop:
             - zabbix-server-mysql 
             - zabbix-agent 
-            - zabbix-web-mysql
-            - zabbix-apache-conf
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
 
