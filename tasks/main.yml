@@ -50,6 +50,7 @@
 
     -   name: Import Schema
         shell: zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -pzabbix zabbix
+        ignore_errors: yes
         when: 
             - os_check.stdout | regex_search("Ubuntu")
         
