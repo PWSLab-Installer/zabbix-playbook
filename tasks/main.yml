@@ -14,6 +14,20 @@
         when: 
             - os_check.stdout | regex_search("Ubuntu 20") 
 
+    -   name: Download Zabbix - CentOS 7
+        get_url:
+            url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/7/x86_64/zabbix-release-{{ zabbix_version }}-1.el7.noarch.rpm
+            dest: /tmp/zabbix-release-{{ zabbix_version }}-1.el7.noarch.rpm
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7") 
+
+    -   name: Download Zabbix - CentOS 8
+        get_url:
+            url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/8/x86_64/zabbix-release-{{ zabbix_version }}-1.el8.noarch.rpm
+            dest: /tmp/zabbix-release-{{ zabbix_version }}-1.el8.noarch.rpm
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 8") 
+
     -   name: Install Zabbix
         command: dpkg -i /tmp/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
         when: 
@@ -23,6 +37,31 @@
         command: dpkg -i /tmp/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
         when: 
             - os_check.stdout | regex_search("Ubuntu 20")
+
+    -   name: Install Zabbix
+        command: rpm -Uvh /tmp/zabbix-release-{{ zabbix_version }}-1.el7.noarch.rpm
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Install Zabbix
+        command: rpm -Uvh /tmp/zabbix-release-{{ zabbix_version }}-1.el8.noarch.rpm
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 8")
+
+    -   name: Yum Clean All
+        command: yum clean all
+        when: 
+            - os_check.stdout | regex_search("CentOS")
+
+    -   name: Update cache
+        yum: 
+            name: "{{ item }}" 
+        loop:
+            - zabbix-server-mysql 
+            - zabbix-web-mysql
+            - zabbix-agent
+        when: 
+            - os_check.stdout | regex_search("CentOS")
 
     -   name: Update cache
         apt: 
@@ -59,22 +98,28 @@
         ignore_errors: yes
         when: 
             - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Import Schema
+        shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pzabbix zabbix
+        ignore_errors: yes
+        when: 
+            - os_check.stdout | regex_search("CentOS")
         
     -   name: Sets Zabbix conf file - Ubuntu
         become: true
         template:
             src: "zabbix.conf.j2"
             dest: "/etc/zabbix/zabbix_server.conf"
-        when:
-                - os_check.stdout | regex_search("Ubuntu")
+        # when:
+        #         - os_check.stdout | regex_search("Ubuntu")
 
     -   name: Sets Apache conf file - Ubuntu
         become: true
         template:
             src: "apache.conf.j2"
             dest: "/etc/zabbix/apache.conf"
-        when:
-                - os_check.stdout | regex_search("Ubuntu")
+        # when:
+        #         - os_check.stdout | regex_search("Ubuntu")
 
     -   name: Create symbolic link 
         file:
@@ -84,12 +129,27 @@
         when:
                 - os_check.stdout | regex_search("Ubuntu")
 
+    -   name: Create symbolic link 
+        file:
+            src: "/etc/zabbix/apache.conf"
+            dest: "/etc/httpd/conf.d/zabbix.conf"
+            state: link
+        when:
+                - os_check.stdout | regex_search("CentOS")
+
     -   name: Restart Apache
         service:
             name: apache2
             state: restarted
         when:
                 - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Restart Apache
+        service:
+            name: httpd
+            state: restarted
+        when:
+                - os_check.stdout | regex_search("CentOS")
 
     -   name: Ensure Zabbix Server is running and set to start on boot
         service: 
