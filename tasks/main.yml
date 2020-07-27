@@ -2,14 +2,14 @@
 
     -   name: Download Zabbix - Ubuntu 18
         get_url:
-            url: wget https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
+            url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
             dest: /tmp/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
         when: 
             - os_check.stdout | regex_search("Ubuntu 18")
 
     -   name: Download Zabbix - Ubuntu 20
         get_url:
-            url: wget https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
+            url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
             dest: /tmp/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
         when: 
             - os_check.stdout | regex_search("Ubuntu 20") 
