@@ -1,0 +1,25 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    zabbix_version: 5.0
+
+  tasks:
+      
+    -   name: Check the version of OS
+        command: hostnamectl
+        register: os_check
+        ignore_errors: yes 
+
+    -   name: Fetch Zabbix Role
+        git:
+            repo: https://ro:h6sWfioy4fwBqnzsM6oC@pwslab.org/ansible/zabbix-playbook.git
+            dest: /root/.ansible/roles/pwslab.zabbix
+            version: master
+            force: yes
+
+    -   name: Installing Zabbix
+        include_role:
+            name: pwslab.zabbix
+
+    

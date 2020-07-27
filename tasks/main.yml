@@ -1,0 +1,86 @@
+---
+
+    -   name: Download Zabbix - Ubuntu 18
+        get_url:
+            url: wget https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
+            dest: /tmp/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
+        when: 
+            - os_check.stdout | regex_search("Ubuntu 18")
+
+    -   name: Download Zabbix - Ubuntu 20
+        get_url:
+            url: wget https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
+            dest: /tmp/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
+        when: 
+            - os_check.stdout | regex_search("Ubuntu 20") 
+
+    -   name: Install Zabbix
+        command: dpkg -i /tmp/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
+        when: 
+            - os_check.stdout | regex_search("Ubuntu 18")
+
+    -   name: Install Zabbix
+        command: dpkg -i /tmp/zabbix-release_{{ zabbix_version }}-1+focal_all.deb
+        when: 
+            - os_check.stdout | regex_search("Ubuntu 20")
+
+    -   name: Update cache
+        apt: 
+            name: "{{ item }}" 
+            update_cache: yes
+        loop:
+            - zabbix-server-mysql 
+            - zabbix-frontend-php
+            - zabbix-agent
+        when: 
+            - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Create a new database with name 'zabbix'
+        mysql_db:
+            name: zabbix
+            state: present
+            encoding: utf8
+
+    -   name: Grant all Privs
+        mysql_user:
+            name: zabbix
+            password: zabbix
+            priv: '*zabbix.*:ALL,GRANT'
+            state: present
+
+    -   name: Import Schema
+        command: zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -pzabbix zabbix
+        when: 
+            - os_check.stdout | regex_search("Ubuntu")
+        
+    -   name: Sets Zabbix conf file - Ubuntu
+        become: true
+        template:
+            src: "zabbix.conf.j2"
+            dest: "/etc/zabbix/zabbix_server.conf"
+        when:
+                - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Sets Apache conf file - Ubuntu
+        become: true
+        template:
+            src: "apache.conf.j2"
+            dest: "/etc/zabbix/apache.conf"
+        when:
+                - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Restart Apache
+        service:
+            name: apache2
+            state: restarted
+        when:
+                - os_check.stdout | regex_search("Ubuntu")
+
+    -   name: Ensure Zabbix Server is running and set to start on boot
+        service: 
+            name: sonar 
+            state: restarted 
+            enabled: yes
+
+    
+    
