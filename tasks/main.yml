@@ -49,7 +49,7 @@
             state: present
 
     -   name: Import Schema
-        command: zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -pzabbix zabbix
+        shell: zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -pzabbix zabbix
         when: 
             - os_check.stdout | regex_search("Ubuntu")
         
