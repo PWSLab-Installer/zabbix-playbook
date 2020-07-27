@@ -68,10 +68,6 @@
         when: 
             - os_check.stdout | regex_search("CentOS")
 
-    -   name: Enable zabbix frontend
-        command: yum-config-manager --enable zabbix-frontend
-        when: 
-            - os_check.stdout | regex_search("CentOS")
 
     -   name: Update cache
         yum: 
@@ -80,9 +76,7 @@
             - zabbix-server-mysql 
             - zabbix-web-mysql
             - zabbix-agent
-            - centos-release-scl
-            - zabbix-web-mysql-scl 
-            - zabbix-apache-conf-scl
+            - zabbix-apache-conf
         when: 
             - os_check.stdout | regex_search("CentOS Linux 8")
 
@@ -91,7 +85,24 @@
             name: "{{ item }}" 
         loop:
             - zabbix-server-mysql 
-            - zabbix-agent
+            - zabbix-agent 
+            - zabbix-web-mysql
+            - zabbix-apache-conf
+            - centos-release-scl
+            - zabbix-web-mysql-scl 
+            - zabbix-apache-conf-scl
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Enable zabbix frontend
+        command: yum-config-manager --enable zabbix-frontend
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Enable Frontend Yum repo
+        yum: 
+            name: "{{ item }}" 
+        loop:
             - centos-release-scl
             - zabbix-web-mysql-scl 
             - zabbix-apache-conf-scl
@@ -153,8 +164,8 @@
         template:
             src: "apache.conf.j2"
             dest: "/etc/zabbix/apache.conf"
-        # when:
-        #         - os_check.stdout | regex_search("Ubuntu")
+        when:
+                - os_check.stdout | regex_search("Ubuntu")
 
     -   name: Applying PHP
         lineinfile:
@@ -165,6 +176,15 @@
         when:
             - os_check.stdout | regex_search("CentOS Linux 7")
 
+    -   name: Applying PHP
+        lineinfile:
+            dest: /etc/php-fpm.d/zabbix.conf
+            regexp: '^;php_value[date.timezone]'
+            line: 'php_value[date.timezone] = Asia/Kolkata'
+            state: present
+        when:
+            - os_check.stdout | regex_search("CentOS Linux 8")
+
     -   name: Create symbolic link 
         file:
             src: "/etc/zabbix/apache.conf"
@@ -173,13 +193,13 @@
         when:
                 - os_check.stdout | regex_search("Ubuntu")
 
-    -   name: Create symbolic link 
-        file:
-            src: "/etc/zabbix/apache.conf"
-            dest: "/etc/httpd/conf.d/zabbix.conf"
-            state: link
-        when:
-                - os_check.stdout | regex_search("CentOS")
+    # -   name: Create symbolic link 
+    #     file:
+    #         src: "/etc/zabbix/apache.conf"
+    #         dest: "/etc/httpd/conf.d/zabbix.conf"
+    #         state: link
+    #     when:
+    #             - os_check.stdout | regex_search("CentOS")
 
     -   name: Restart Apache
         service:
@@ -201,6 +221,13 @@
             state: restarted
         when:
                 - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Restart php-fpm
+        service:
+            name: php-fpm
+            state: restarted
+        when:
+                - os_check.stdout | regex_search("CentOS Linux 8")
 
     -   name: Ensure Zabbix Server is running and set to start on boot
         service: 

@@ -3,10 +3,6 @@
 
   vars:
     zabbix_version: 5.0
-    php_version: '7.2'
-    php_default_version_debian: '7.2'
-    php_webserver_daemon: "httpd"
-    php_packages_state: latest
 
   tasks:
       
@@ -22,15 +18,6 @@
             version: master
             force: yes
 
-    -   name: Install Role PHP
-        local_action: command ansible-galaxy install -f geerlingguy.php
-
-    -   name: Install Role PHP-VERSIONS
-        local_action: command ansible-galaxy install -f geerlingguy.php-versions
-
-    -   name: Install Role REMI
-        local_action: command ansible-galaxy install -f geerlingguy.repo-remi 
-
     -   name: Install Role Apache
         local_action: command ansible-galaxy install -f geerlingguy.apache 
 
@@ -45,25 +32,6 @@
         stat: path=/usr/sbin/httpd
         register: apache_exists
 
-    -   name: Check if PHP is already installed
-        stat: path=/usr/bin/php
-        register: php_exists
-
-    -   name: Applying role PHP
-        command: mv ~/.ansible/roles/geerlingguy.php ~/.ansible/roles/pwslab.php
-        when: not php_exists.stat.exists
-        ignore_errors: yes
-    
-    -   name: Applying role REMI
-        command: mv ~/.ansible/roles/geerlingguy.repo-remi  ~/.ansible/roles/pwslab.repo-remi 
-        when: not php_exists.stat.exists
-        ignore_errors: yes
-    
-    -   name: Applying role PHP-Versions
-        command: mv ~/.ansible/roles/geerlingguy.php-versions ~/.ansible/roles/pwslab.php-versions
-        when: not php_exists.stat.exists
-        ignore_errors: yes
-
     -   name: Applying role MYSQL
         command: mv ~/.ansible/roles/geerlingguy.mysql ~/.ansible/roles/pwslab.mysql
         when: not mysql_exists.stat.exists
@@ -77,23 +45,9 @@
     -   name: Installing Apache
         include_role:
             name: pwslab.apache
-        when: not apache_exists.stat.exists
-
-    - name: Installing PHP-Versions
-      include_role:
-          name: pwslab.php-versions
-      when: 
-        - not php_exists.stat.exists
-        - not os_check.stdout | regex_search("CentOS Linux 8")
-
-    - name: Installing PHP
-      include_role:
-          name: pwslab.php
-      when: 
-        - not php_exists.stat.exists
-        - os_check.stdout | regex_search("CentOS Linux 8")
-      vars:
-        php_webserver_daemon: "httpd"
+        when: 
+            - not apache_exists.stat.exists
+            - os_check.stdout | regex_search("Ubuntu")
 
     -   name: Installing MYSQL
         include_role:
