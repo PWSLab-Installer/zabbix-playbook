@@ -203,7 +203,7 @@
             - os_check.stdout | regex_search("CentOS")
 
     -   name: Execute Schema Process
-        command: mysql -uroot -p'root' zabbix -e "set global innodb_strict_mode='ON';"
+        command: mysql -uroot  zabbix -e "set global innodb_strict_mode='ON';"
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
         
