@@ -25,7 +25,13 @@
             - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: Initiate Mariadb - CentOS 7
-        command: yum -y install MariaDB-server MariaDB-client MySQL-python.x86_64
+        yum: 
+            name: "{{ item }}"
+            state: present
+        loop:
+            - MariaDB-server 
+            - MariaDB-client 
+            - MySQL-python
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
 
