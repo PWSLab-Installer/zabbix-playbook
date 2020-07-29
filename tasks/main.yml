@@ -25,7 +25,7 @@
             - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: Initiate Mariadb - CentOS 7
-        command: yum -y install MariaDB-server MariaDB-client
+        command: yum -y install MariaDB-server MariaDB-client MySQL-python.x86_64
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
 
@@ -35,7 +35,7 @@
             state: started
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
-            
+
     -   name: Download Zabbix - Ubuntu 18
         get_url:
             url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
