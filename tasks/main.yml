@@ -14,10 +14,10 @@
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
 
-    -   name: Remove old entries - CentOS 7
-        command: yum remove mariadb-server mariadb mariadb-libs -y
-        when: 
-            - os_check.stdout | regex_search("CentOS Linux 7")
+    # -   name: Remove old entries - CentOS 7
+    #     command: yum remove mariadb-server mariadb mariadb-libs -y
+    #     when: 
+    #         - os_check.stdout | regex_search("CentOS Linux 7")
 
     -   name: CleanUP cache - CentOS 7
         command: yum clean all
@@ -37,7 +37,8 @@
 
     -   name: Start the MYSQL service - CentOS 7
         service:
-            name: mysql
+            name: mariadb
+            enabled: yes
             state: started
         when: 
             - os_check.stdout | regex_search("CentOS Linux 7")
@@ -288,13 +289,6 @@
             state: restarted 
             enabled: yes
 
-    - name: Applying replacement on CentOS
-      lineinfile:
-          dest: ~/.ansible/roles/pwslab.mysql/vars/RedHat-7.yml
-          regexp: '^__mysql_daemon:'
-          line: '__mysql_daemon: mysql'
-          state: present
-      when:
-        - os_check.stdout | regex_search("CentOS Linux 7")
+
     
     
