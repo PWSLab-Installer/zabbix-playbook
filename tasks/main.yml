@@ -287,5 +287,14 @@
             name: zabbix-agent 
             state: restarted 
             enabled: yes
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.mysql/vars/RedHat-7.yml
+          regexp: '^__mysql_daemon:'
+          line: '__mysql_daemon: mysql'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux 7")
     
     
