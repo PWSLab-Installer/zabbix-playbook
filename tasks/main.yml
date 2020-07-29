@@ -1,5 +1,34 @@
 ---
 
+    -   name: Add MariaDB - CentOS 7
+        lineinfile:
+            path: /etc/yum.repos.d/MariaDB10.repo
+            line: "{{ item }}"
+            create: yes
+        loop:
+            - "[mariadb]"
+            - name = MariaDB
+            - baseurl = http://yum.mariadb.org/10.1/centos7-amd64
+            - gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+            - gpgcheck=1
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Remove old entries - CentOS 7
+        command: yum remove mariadb-server mariadb mariadb-libs -y
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: CleanUP cache - CentOS 7
+        command: yum clean all
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Initiate Mariadb - CentOS 7
+        command: yum -y install MariaDB-server MariaDB-client
+        when: 
+            - os_check.stdout | regex_search("CentOS Linux 7")
+
     -   name: Download Zabbix - Ubuntu 18
         get_url:
             url: https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+bionic_all.deb
