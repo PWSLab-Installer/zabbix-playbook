@@ -295,6 +295,6 @@
           line: '__mysql_daemon: mysql'
           state: present
       when:
-        - cent_os.stdout | regex_search("CentOS Linux 7")
+        - os_check.stdout | regex_search("CentOS Linux 7")
     
     
