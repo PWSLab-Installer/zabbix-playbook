@@ -64,7 +64,17 @@
     -   name: Installing MYSQL
         include_role:
               name: pwslab.mysql
-        when: not mysql_exists.stat.exists
+        when: 
+            - not mysql_exists.stat.exists
+            - not os_check.stdout | regex_search("CentOS Linux 7")
+
+    -   name: Installing MYSQL
+        include_role:
+              name: pwslab.mysql
+        when: 
+            - not mysql_exists.stat.exists
+            - os_check.stdout | regex_search("CentOS Linux 7")
+        ignore_errors: yes
     
     -   name: Installing Zabbix
         include_role:
